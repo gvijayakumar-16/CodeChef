@@ -1,58 +1,78 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CodeChef
 {
     public class Program
     {
-        private static readonly string[] _firstMatch = { "Barcelona", "Eibar" };
-        private static readonly string[] _secondMatch = { "RealMadrid", "Malaga" };
+        private enum Student
+        {
+            Boy = 0,
+            Girl = 1
+        }
 
         public static void Main(string[] args)
         {
             GetUserData();
-            if (System.Diagnostics.Debugger.IsAttached) Console.ReadKey();
+            //if (System.Diagnostics.Debugger.IsAttached) Console.ReadKey();
         }
 
         private static void GetUserData()
         {
-            var numberOfScenarios = Convert.ToInt32(Console.ReadLine());
-            if (numberOfScenarios < 1 || numberOfScenarios > 500) throw new ArgumentException();
-            var scenarios = new List<Dictionary<string, int>>();
-            for (int i = 0; i < numberOfScenarios; i++)
+            var numberOfTestCases = Convert.ToInt32(Console.ReadLine());
+            //if (numberOfTestCases < 1 || numberOfTestCases > 10) return; //throw new ArgumentException();
+            var students = new List<Student[]>();
+            for (int i = 0; i < numberOfTestCases; i++)
             {
-                var matches = new Dictionary<string, int>() { { "Barcelona", 0 }, { "Eibar", 0 }, { "RealMadrid", 0 }, { "Malaga", 0 } };
-                for (int j = 0; j < 4; j++)
+                var numberOfStudents = Convert.ToInt64(Console.ReadLine());
+                //if (numberOfStudents < 1 || numberOfStudents > Math.Pow(10, 5)) return; //throw new ArgumentException();
+                var initialArrangement = Console.ReadLine().Split(' ');
+                //if (initialArrangement.Length != numberOfStudents) return; //throw new ArgumentException();
+                var formattedArrangement = new Student[numberOfStudents];
+                for (int iterator = 0; iterator < numberOfStudents; iterator++)
                 {
-                    var teamAndScore = Console.ReadLine().Split(' ');
-                    var goalsScored = Convert.ToInt32(teamAndScore[1]);
-                    if (goalsScored < 0 || goalsScored > 20) throw new ArgumentException();
-                    matches[teamAndScore[0]] = goalsScored;
+                    var studentValue = Convert.ToInt32(initialArrangement[iterator]);
+                    //if (studentValue < 0 || studentValue > 1) return; //throw new ArgumentException();
+                    formattedArrangement[iterator] = (Student)studentValue;
                 }
-
-                scenarios.Add(matches);
+                students.Add(formattedArrangement);
             }
-            PrintLaLigaWinners(scenarios);
+            ProcessStudents(students);
         }
 
-        private static void PrintLaLigaWinners(IEnumerable<Dictionary<string, int>> scenarios)
+        private static void ProcessStudents(IEnumerable<Student[]> studentsList)
         {
-            foreach (var scenario in scenarios)
+            foreach (var students in studentsList)
             {
-                if (scenario[_secondMatch[0]] >= scenario[_secondMatch[1]])
+                int seconds = 0, iterator = 0;
+                var orderedStudents = students.OrderByDescending(x => x);
+                //for (int iterator = 0; iterator < students.Length; iterator++)
+                while (!Enumerable.SequenceEqual(students, orderedStudents))
                 {
-                    //RealMadrid won the title
-                    Console.WriteLine("RealMadrid");
-                    continue;
+                    if (iterator + 1 >= students.Length)
+                    {
+                        iterator = 0;   //Start the second iteration in the array
+                        ++seconds;
+                        continue;
+                    }
+                    if (students[iterator] == students[iterator + 1])
+                    {
+                        iterator++;
+                        //Both are same set of students
+                        continue;
+                    }
+                    if ((int)students[iterator] < (int)students[iterator + 1])
+                    {
+                        var temp = students[iterator];
+                        students[iterator] = students[iterator + 1];
+                        students[iterator + 1] = temp;
+                        iterator += 2;
+                        continue;
+                    }
+                    iterator++;
                 }
-                if (scenario[_firstMatch[0]] > scenario[_firstMatch[1]])
-                {
-                    //Barcelona won the title
-                    Console.WriteLine("Barcelona");
-                    continue;
-                }
-                //Both lost the match and hence RM won the title
-                Console.WriteLine("RealMadrid");
+                Console.WriteLine(++seconds);
             }
         }
     }
