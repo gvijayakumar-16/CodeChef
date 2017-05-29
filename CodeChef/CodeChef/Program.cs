@@ -26,7 +26,7 @@ namespace CodeChef
                 {
                     var teamAndScore = Console.ReadLine().Split(' ');
                     var goalsScored = Convert.ToInt32(teamAndScore[1]);
-                    if (goalsScored < 0) throw new ArgumentException();
+                    if (goalsScored < 0 || goalsScored > 20) throw new ArgumentException();
                     matches[teamAndScore[0]] = goalsScored;
                 }
 
