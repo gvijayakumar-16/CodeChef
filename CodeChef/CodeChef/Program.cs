@@ -15,32 +15,19 @@ namespace CodeChef
         private static void GetUserData()
         {
             var numberOfTestCases = Convert.ToInt32(Console.ReadLine());
-            if (numberOfTestCases < 1 || numberOfTestCases > 200) throw new ArgumentException();
+            if (numberOfTestCases < 1 || numberOfTestCases > 20) throw new ArgumentException();
             var results = new List<string>();
-            var matchingIngredients = 0;
             for (int i = 0; i < numberOfTestCases; i++)
             {
-                var firstDishIngredients = Console.ReadLine().Split(' ');
-                var secondDishIngredients = Console.ReadLine().Split(' ');
-                foreach (var ingredient in firstDishIngredients)
-                {
-                    foreach (var ingredient2 in secondDishIngredients)
-                    {
-                        if (ingredient.IsValid() || ingredient2.IsValid()) throw new ArgumentException();
-                        if (matchingIngredients >= 2) break;
-                        if (string.Equals(ingredient, ingredient2)) ++matchingIngredients;
-                    }
-                    if (matchingIngredients >= 2)
-                    {
-                        break;
-                    }
-                }
-                if (matchingIngredients >= 2)
-                    results.Add("similar");
-                else
-                    results.Add("dissimilar");
-                matchingIngredients = 0;
+                var activities = Console.ReadLine().ToCharArray();
+                if (activities.Length < 1 || activities.Length > Math.Pow(10, 5)) throw new ArgumentException();
+                results.Add(activities.IsValidLog() ? "yes" : "no");
             }
+            PrintResults(results);
+        }
+
+        private static void PrintResults(IEnumerable<string> results)
+        {
             foreach (var result in results)
             {
                 Console.WriteLine(result);
@@ -50,9 +37,23 @@ namespace CodeChef
 
     public static class ProgramExtensions
     {
-        public static bool IsValid(this string ingredient)
+        public static bool IsValidLog(this char[] activities)
         {
-            return ingredient.Length < 2 || ingredient.Length > 10;
+            char previousActivity;
+            for (int i = 1; i < activities.Length; i++)
+            {
+                previousActivity = activities[i - 1];
+                switch (activities[i])
+                {
+                    case 'C':
+                        if (previousActivity == 'E' || previousActivity == 'S') return false;
+                        break;
+                    case 'E':
+                        if (previousActivity == 'S') return false;
+                        break;
+                }
+            }
+            return true;
         }
     }
 }
