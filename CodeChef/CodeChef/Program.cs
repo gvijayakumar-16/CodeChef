@@ -6,74 +6,53 @@ namespace CodeChef
 {
     public class Program
     {
-        private enum Student
-        {
-            Boy = 0,
-            Girl = 1
-        }
-
         public static void Main(string[] args)
         {
             GetUserData();
-            //if (System.Diagnostics.Debugger.IsAttached) Console.ReadKey();
+            if (System.Diagnostics.Debugger.IsAttached) Console.ReadKey();
         }
 
         private static void GetUserData()
         {
             var numberOfTestCases = Convert.ToInt32(Console.ReadLine());
-            //if (numberOfTestCases < 1 || numberOfTestCases > 10) return; //throw new ArgumentException();
-            var students = new List<Student[]>();
+            if (numberOfTestCases < 1 || numberOfTestCases > 200) throw new ArgumentException();
+            var results = new List<string>();
+            var matchingIngredients = 0;
             for (int i = 0; i < numberOfTestCases; i++)
             {
-                var numberOfStudents = Convert.ToInt64(Console.ReadLine());
-                //if (numberOfStudents < 1 || numberOfStudents > Math.Pow(10, 5)) return; //throw new ArgumentException();
-                var initialArrangement = Console.ReadLine().Split(' ');
-                //if (initialArrangement.Length != numberOfStudents) return; //throw new ArgumentException();
-                var formattedArrangement = new Student[numberOfStudents];
-                for (int iterator = 0; iterator < numberOfStudents; iterator++)
+                var firstDishIngredients = Console.ReadLine().Split(' ');
+                var secondDishIngredients = Console.ReadLine().Split(' ');
+                foreach (var ingredient in firstDishIngredients)
                 {
-                    var studentValue = Convert.ToInt32(initialArrangement[iterator]);
-                    //if (studentValue < 0 || studentValue > 1) return; //throw new ArgumentException();
-                    formattedArrangement[iterator] = (Student)studentValue;
+                    foreach (var ingredient2 in secondDishIngredients)
+                    {
+                        if (ingredient.IsValid() || ingredient2.IsValid()) throw new ArgumentException();
+                        if (matchingIngredients >= 2) break;
+                        if (string.Equals(ingredient, ingredient2)) ++matchingIngredients;
+                    }
+                    if (matchingIngredients >= 2)
+                    {
+                        break;
+                    }
                 }
-                students.Add(formattedArrangement);
+                if (matchingIngredients >= 2)
+                    results.Add("similar");
+                else
+                    results.Add("dissimilar");
+                matchingIngredients = 0;
             }
-            ProcessStudents(students);
-        }
-
-        private static void ProcessStudents(IEnumerable<Student[]> studentsList)
-        {
-            foreach (var students in studentsList)
+            foreach (var result in results)
             {
-                int seconds = 0, iterator = 0;
-                var orderedStudents = students.OrderByDescending(x => x);
-                //for (int iterator = 0; iterator < students.Length; iterator++)
-                while (!Enumerable.SequenceEqual(students, orderedStudents))
-                {
-                    if (iterator + 1 >= students.Length)
-                    {
-                        iterator = 0;   //Start the second iteration in the array
-                        ++seconds;
-                        continue;
-                    }
-                    if (students[iterator] == students[iterator + 1])
-                    {
-                        iterator++;
-                        //Both are same set of students
-                        continue;
-                    }
-                    if ((int)students[iterator] < (int)students[iterator + 1])
-                    {
-                        var temp = students[iterator];
-                        students[iterator] = students[iterator + 1];
-                        students[iterator + 1] = temp;
-                        iterator += 2;
-                        continue;
-                    }
-                    iterator++;
-                }
-                Console.WriteLine(++seconds);
+                Console.WriteLine(result);
             }
+        }
+    }
+
+    public static class ProgramExtensions
+    {
+        public static bool IsValid(this string ingredient)
+        {
+            return ingredient.Length < 2 || ingredient.Length > 10;
         }
     }
 }
